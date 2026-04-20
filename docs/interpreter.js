@@ -2,8 +2,9 @@
  * 해씨 (lang-lang) JavaScript 인터프리터
  * Tokenizer → Parser → Interpreter
  */
- 
+
 const LangInterpreter = (() => {
+
   // ============================================================
   // 1. 수 변환 (Converter)
   // ============================================================
@@ -130,23 +131,13 @@ const LangInterpreter = (() => {
       const c = source[pos];
 
       // 공백/탭/캐리지리턴
-      if (c === " " || c === "\t" || c === "\r") {
+      if (c === ' ' || c === '\t' || c === '\r') {
         flushIdent();
         pos++;
         continue;
       }
 
-      // 줄바꿈: '결국' 키워드 또는 일반 \n 모두 허용
-      if (source.slice(pos, pos + 2) === "결국") {
-        flushIdent();
-        if (!tokens.length || tokens[tokens.length - 1][0] !== "NEWLINE") {
-          tokens.push(["NEWLINE", null]);
-        }
-        pos += 2;
-        continue;
-      }
-
-      if (c === "\n") {
+      if (c === '\n') {
         flushIdent();
         if (!tokens.length || tokens[tokens.length - 1][0] !== "NEWLINE") {
           tokens.push(["NEWLINE", null]);
@@ -156,41 +147,31 @@ const LangInterpreter = (() => {
       }
 
       // 문자열: 정...정 (이스케이프 지원)
-      if (c === "정") {
+      if (c === '정') {
         flushIdent();
         pos++;
         const result = [];
         let closed = false;
         while (pos < source.length) {
           const ch = source[pos];
-          if (ch === "정") {
+          if (ch === '정') {
             pos++;
             closed = true;
             break;
-          } else if (ch === "빛") {
+          } else if (ch === '빛') {
             pos++;
-            if (pos < source.length) {
-              result.push(source[pos]);
-              pos++;
-            }
-          } else if (ch === "비") {
+            if (pos < source.length) { result.push(source[pos]); pos++; }
+          } else if (ch === '비') {
             pos++;
             while (pos < source.length) {
-              if (source[pos] === "잋") {
-                pos++;
-                break;
-              } else if (
-                source[pos] === "빛" &&
-                pos + 1 < source.length &&
-                source[pos + 1] === "잋"
-              ) {
-                result.push("잋");
-                pos += 2;
-              } else {
-                result.push(source[pos]);
-                pos++;
-              }
+              if (source[pos] === '잋') { pos++; break; }
+              else if (source[pos] === '빛' && pos + 1 < source.length && source[pos + 1] === '잋') {
+                result.push('잋'); pos += 2;
+              } else { result.push(source[pos]); pos++; }
             }
+          } else if (source.slice(pos, pos + 2) === '결국') {
+            result.push('\n');
+            pos += 2;
           } else {
             result.push(ch);
             pos++;
@@ -233,23 +214,13 @@ const LangInterpreter = (() => {
       if (matched) continue;
 
       // 식별자 안에서 비...잋 이스케이프 블록
-      if (c === "비") {
+      if (c === '비') {
         pos++;
         while (pos < source.length) {
-          if (source[pos] === "잋") {
-            pos++;
-            break;
-          } else if (
-            source[pos] === "빛" &&
-            pos + 1 < source.length &&
-            source[pos + 1] === "잋"
-          ) {
-            identBuf.push("잋");
-            pos += 2;
-          } else {
-            identBuf.push(source[pos]);
-            pos++;
-          }
+          if (source[pos] === '잋') { pos++; break; }
+          else if (source[pos] === '빛' && pos + 1 < source.length && source[pos + 1] === '잋') {
+            identBuf.push('잋'); pos += 2;
+          } else { identBuf.push(source[pos]); pos++; }
         }
         continue;
       }
@@ -668,4 +639,5 @@ const LangInterpreter = (() => {
   }
 
   return { run, tokenize, parseNumber };
+
 })();
