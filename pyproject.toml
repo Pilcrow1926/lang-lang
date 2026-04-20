@@ -17,11 +17,11 @@ classifiers = [
 ]
 
 [project.scripts]
-rang = "sunflower.cli:main"
+rang = "rang.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["sunflower*"]
+include = ["rang*"]
 
 [tool.setuptools.package-dir]
 "" = "."
