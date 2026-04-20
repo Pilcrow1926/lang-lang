@@ -22,3 +22,6 @@ rang = "sunflower.cli:main"
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["sunflower*"]
+
+[tool.setuptools.package-dir]
+"" = "."
