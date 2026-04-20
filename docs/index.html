@@ -19,6 +19,16 @@
     --success: #6bffb8;
     --font-code: 'Nanum Gothic Coding', monospace;
     --font-ui: 'Gowun Dodum', sans-serif;
+
+    /* 신택스 하이라이팅 색상 */
+    --syn-keyword: #cc99cd;
+    --syn-type: #82aaff;
+    --syn-operator: #a8b9cc;
+    --syn-number: #b5cea8;
+    --syn-string: #ce9178;
+    --syn-builtin: #dcdcaa;
+    --syn-escape: #629755;    /* 이스케이프: IntelliJ 특수문자 */
+    --syn-paren: #e8e8e0;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -33,7 +43,6 @@
     overflow: hidden;
   }
 
-  /* 헤더 */
   header {
     display: flex;
     align-items: center;
@@ -54,24 +63,16 @@
     letter-spacing: -0.5px;
   }
 
-  .logo-icon {
-    font-size: 22px;
-    animation: sway 3s ease-in-out infinite;
-  }
+  .logo-icon { font-size: 22px; animation: sway 3s ease-in-out infinite; }
 
   @keyframes sway {
     0%, 100% { transform: rotate(-5deg); }
     50% { transform: rotate(5deg); }
   }
 
-  .logo-lang {
-    color: var(--accent);
-  }
+  .logo-lang { color: var(--accent); }
 
-  .header-actions {
-    display: flex;
-    gap: 8px;
-  }
+  .header-actions { display: flex; gap: 8px; }
 
   .btn {
     display: flex;
@@ -86,33 +87,12 @@
     transition: all 0.15s;
   }
 
-  .btn-primary {
-    background: var(--accent);
-    color: #0f0f0f;
-    font-weight: 700;
-  }
+  .btn-primary { background: var(--accent); color: #0f0f0f; font-weight: 700; }
+  .btn-primary:hover { background: var(--accent2); transform: translateY(-1px); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-ghost { background: transparent; color: var(--text-dim); border: 1px solid var(--border); }
+  .btn-ghost:hover { background: var(--surface2); color: var(--text); }
 
-  .btn-primary:hover {
-    background: var(--accent2);
-    transform: translateY(-1px);
-  }
-
-  .btn-primary:active {
-    transform: translateY(0);
-  }
-
-  .btn-ghost {
-    background: transparent;
-    color: var(--text-dim);
-    border: 1px solid var(--border);
-  }
-
-  .btn-ghost:hover {
-    background: var(--surface2);
-    color: var(--text);
-  }
-
-  /* 메인 레이아웃 */
   main {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -121,7 +101,6 @@
     overflow: hidden;
   }
 
-  /* 편집기 */
   .editor-pane {
     display: flex;
     flex-direction: column;
@@ -143,44 +122,61 @@
     flex-shrink: 0;
   }
 
-  .pane-header-left {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
+  .pane-header-left { display: flex; align-items: center; gap: 8px; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
 
-  .dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--accent);
-  }
-
-  #editor {
+  /* ── 신택스 하이라이팅 에디터 ── */
+  .editor-wrapper {
+    position: relative;
     flex: 1;
-    background: var(--bg);
-    color: var(--text);
+    overflow: auto;
+  }
+
+  /* textarea와 highlight div가 완전히 겹치도록 */
+  #editor, #highlight {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 20px;
     font-family: var(--font-code);
     font-size: 14px;
     line-height: 1.7;
-    padding: 20px;
+    tab-size: 2;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow: hidden;
+  }
+
+  #editor {
+    background: transparent;
+    color: transparent;        /* 텍스트는 보이지 않게 */
+    caret-color: var(--text);  /* 커서는 보이게 */
     border: none;
     outline: none;
     resize: none;
-    tab-size: 2;
+    z-index: 2;
   }
 
-  #editor::placeholder {
-    color: var(--text-dim);
-    opacity: 0.5;
+  #highlight {
+    background: var(--bg);
+    color: var(--text);
+    pointer-events: none;      /* 클릭 이벤트는 textarea로 */
+    z-index: 1;
   }
 
-  /* 출력 */
-  .output-pane {
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
+  /* 신택스 색상 클래스 */
+  .syn-keyword  { color: var(--syn-keyword); font-weight: 700; }
+  .syn-type     { color: var(--syn-type); font-weight: 700; }
+  .syn-operator { color: var(--syn-operator); }
+  .syn-number   { color: var(--syn-number); }
+  .syn-string   { color: var(--syn-string); }
+  .syn-builtin  { color: var(--syn-builtin); font-weight: 700; }
+  .syn-escape   { color: var(--syn-escape); opacity: 0.8; }
+  .syn-paren    { color: var(--syn-paren); }
+
+  .output-pane { display: flex; flex-direction: column; overflow: hidden; }
 
   #output {
     flex: 1;
@@ -204,7 +200,6 @@
   .output-error { color: var(--error); }
   .output-success { color: var(--success); }
 
-  /* 예제 바 */
   .examples-bar {
     grid-column: 1 / -1;
     display: flex;
@@ -245,32 +240,21 @@
     background: rgba(245, 200, 66, 0.05);
   }
 
-  /* 스크롤바 */
   ::-webkit-scrollbar { width: 6px; height: 6px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
   ::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
 
-  /* 실행 중 애니메이션 */
-  .btn-primary.running {
-    animation: pulse 0.8s ease-in-out infinite;
-  }
+  .btn-primary.running { animation: pulse 0.8s ease-in-out infinite; }
 
   @keyframes pulse {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.6; }
   }
 
-  /* 반응형 */
   @media (max-width: 640px) {
-    main {
-      grid-template-columns: 1fr;
-      grid-template-rows: 1fr 1fr auto;
-    }
-    .editor-pane {
-      border-right: none;
-      border-bottom: 1px solid var(--border);
-    }
+    main { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr auto; }
+    .editor-pane { border-right: none; border-bottom: 1px solid var(--border); }
   }
 </style>
 </head>
@@ -283,9 +267,7 @@
   </div>
   <div class="header-actions">
     <button class="btn btn-ghost" onclick="clearOutput()">지우기</button>
-    <button class="btn btn-primary" id="runBtn" onclick="runCode()">
-      ▶ 실행
-    </button>
+    <button class="btn btn-primary" id="runBtn" onclick="runCode()">▶ 실행</button>
   </div>
 </header>
 
@@ -298,8 +280,10 @@
       </div>
       <span>.sf</span>
     </div>
-    <textarea id="editor" spellcheck="false" placeholder="해씨 코드를 입력하세요...
-예: 난뭐정안녕하세요정엇"></textarea>
+    <div class="editor-wrapper">
+      <div id="highlight" aria-hidden="true"></div>
+      <textarea id="editor" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+    </div>
   </div>
 
   <div class="output-pane">
@@ -325,15 +309,160 @@
 
 <script src="interpreter.js"></script>
 <script>
-  const examples = {
-    hello: `난뭐정안녕하세요, 해씨입니다!정엇`,
+// ──────────────────────────────────────────────
+// 신택스 하이라이터
+// ──────────────────────────────────────────────
+const SYNTAX_RULES = [
+  // 순서 중요: 긴 것부터
 
-    gugudan: `매우 단 캬 근랑
+  // 타입 키워드
+  { re: /안타까워|이건/g,            cls: 'syn-type' },
+  // 매우는 for 문맥에서도 쓰이므로 함께
+  { re: /매우/g,                     cls: 'syn-type' },
+
+  // 제어문 키워드
+  { re: /내꿈꿔|장미|나가|뒷/g,      cls: 'syn-keyword' },
+  { re: /엄(?!랑)/g,                 cls: 'syn-keyword' },
+  { re: /호야|택|틱/g,               cls: 'syn-keyword' },
+
+  // 내장 함수
+  { re: /난(?=뭐)/g,                 cls: 'syn-builtin' },
+
+  // 괄호
+  { re: /뭐|엇/g,                    cls: 'syn-paren' },
+
+  // 비교/논리 연산자 (긴 것부터)
+  { re: /캬캬|와캬|준캬|영캬|심지어|끔찍해|죽어/g, cls: 'syn-operator' },
+  { re: /캬|준|영|허얼|네에/g,        cls: 'syn-operator' },
+
+  // 산술 연산자
+  { re: /헐|겸|헉(?!랑)/g,           cls: 'syn-operator' },
+  { re: /네(?!에|랑)/g,              cls: 'syn-operator' },
+
+  // 구두점
+  { re: /그래/g,                     cls: 'syn-operator' },
+];
+
+function escapeHtml(text) {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+function highlight(source) {
+  const lines = source.split('\n');
+  return lines.map(line => highlightLine(line)).join('\n');
+}
+
+function highlightLine(line) {
+  // 토큰 단위로 분리해서 색칠
+  // segments: [{text, cls}]
+  let segments = [{ text: line, cls: null }];
+
+  // 1) 문자열(정...정) 먼저 처리
+  segments = processStrings(segments);
+
+  // 2) 수 표현(느그?대?[여두근훌]+랑) 처리
+  segments = processNumbers(segments);
+
+  // 3) 나머지 키워드/연산자 처리
+  for (const rule of SYNTAX_RULES) {
+    segments = processRule(segments, rule.re, rule.cls);
+  }
+
+  return segments.map(s =>
+    s.cls
+      ? `<span class="${s.cls}">${escapeHtml(s.text)}</span>`
+      : escapeHtml(s.text)
+  ).join('');
+}
+
+function processStrings(segments) {
+  const result = [];
+  for (const seg of segments) {
+    if (seg.cls) { result.push(seg); continue; }
+    const text = seg.text;
+    let i = 0;
+    let buf = '';
+    while (i < text.length) {
+      if (text[i] === '정') {
+        if (buf) { result.push({ text: buf, cls: null }); buf = ''; }
+        // 문자열 끝 찾기 (이스케이프 고려)
+        let strText = '정';
+        i++;
+        while (i < text.length) {
+          if (text[i] === '빛' && i + 1 < text.length) {
+            strText += text[i] + text[i + 1]; i += 2;
+          } else if (text[i] === '비') {
+            let block = '비'; i++;
+            while (i < text.length) {
+              if (text[i] === '잋') { block += '잋'; i++; break; }
+              else if (text[i] === '빛' && i + 1 < text.length && text[i+1] === '잋') {
+                block += '빛잋'; i += 2;
+              } else { block += text[i]; i++; }
+            }
+            strText += block;
+          } else if (text[i] === '정') {
+            strText += '정'; i++; break;
+          } else { strText += text[i]; i++; }
+        }
+        result.push({ text: strText, cls: 'syn-string' });
+      } else {
+        buf += text[i]; i++;
+      }
+    }
+    if (buf) result.push({ text: buf, cls: null });
+  }
+  return result;
+}
+
+function processNumbers(segments) {
+  const numRe = /느그대[여두근훌][두근훌]*랑|느그[여두근훌][두근훌]*랑|대[여두근훌][두근훌]*랑|[여두근훌][두근훌]*랑/g;
+  const result = [];
+  for (const seg of segments) {
+    if (seg.cls) { result.push(seg); continue; }
+    processRule([seg], numRe, 'syn-number').forEach(s => result.push(s));
+    numRe.lastIndex = 0;
+  }
+  return result;
+}
+
+function processRule(segments, re, cls) {
+  const result = [];
+  for (const seg of segments) {
+    if (seg.cls) { result.push(seg); continue; }
+    const text = seg.text;
+    re.lastIndex = 0;
+    let last = 0;
+    let m;
+    while ((m = re.exec(text)) !== null) {
+      if (m.index > last) result.push({ text: text.slice(last, m.index), cls: null });
+      result.push({ text: m[0], cls });
+      last = m.index + m[0].length;
+    }
+    if (last < text.length) result.push({ text: text.slice(last), cls: null });
+  }
+  return result;
+}
+
+function updateHighlight() {
+  const code = document.getElementById('editor').value;
+  document.getElementById('highlight').innerHTML = highlight(code) + '\n';
+}
+
+// ──────────────────────────────────────────────
+// 예제
+// ──────────────────────────────────────────────
+const examples = {
+  hello: `난뭐정안녕하세요, 해씨입니다!정엇`,
+
+  gugudan: `매우 단 캬 근랑
 매우 i 뒷 나가뭐두랑그래대근근랑엇 호야 택
   난뭐단헐정 x 정헐i헐정 = 정헐뭐단겸i엇엇
 틱`,
 
-    fibonacci: `매우 a 캬 여랑
+  fibonacci: `매우 a 캬 여랑
 매우 b 캬 두랑
 매우 i 캬 여랑
 장미 뭐i준대근근랑엇 호야 택
@@ -344,7 +473,7 @@
   i허얼
 틱`,
 
-    condition: `매우 나이 캬 대훌훌훌랑
+  condition: `매우 나이 캬 대훌훌훌랑
 엄 뭐나이영대훌훌훌랑엇 호야 택
   난뭐정성인입니다정엇
 틱
@@ -352,91 +481,98 @@
   난뭐정미성년자입니다정엇
 틱`,
 
-    forloop: `매우 i 뒷 나가뭐두랑그래대근근랑엇 호야 택
+  forloop: `매우 i 뒷 나가뭐두랑그래대근근랑엇 호야 택
   난뭐i헐정번정엇
 틱`,
 
-    escape: `난뭐정빛정 기호 출력하기정엇
+  escape: `난뭐정빛정 기호 출력하기정엇
 난뭐정비이건 매우 엄 내꿈꿔잋 키워드들정엇`,
-  };
+};
 
-  function loadExample(name) {
-    document.getElementById('editor').value = examples[name];
-    clearOutput();
-  }
+function loadExample(name) {
+  document.getElementById('editor').value = examples[name];
+  updateHighlight();
+  clearOutput();
+}
 
-  function clearOutput() {
-    document.getElementById('output').innerHTML = '';
-  }
+function clearOutput() {
+  document.getElementById('output').innerHTML = '';
+}
 
-  function runCode() {
-    const code = document.getElementById('editor').value.trim();
-    if (!code) return;
+function runCode() {
+  const code = document.getElementById('editor').value.trim();
+  if (!code) return;
 
-    const btn = document.getElementById('runBtn');
-    btn.classList.add('running');
-    btn.textContent = '⏳ 실행 중';
+  const btn = document.getElementById('runBtn');
+  btn.classList.add('running');
+  btn.textContent = '⏳ 실행 중';
+  clearOutput();
 
-    clearOutput();
+  setTimeout(() => {
+    try {
+      const result = SunflowerInterpreter.run(code);
+      const outputEl = document.getElementById('output');
 
-    // 약간의 딜레이로 UI 업데이트 보장
-    setTimeout(() => {
-      try {
-        const result = LangInterpreter.run(code);
-        const outputEl = document.getElementById('output');
-
-        if (result.output.length === 0 && !result.error) {
-          const line = document.createElement('span');
-          line.className = 'output-line output-success';
-          line.textContent = '// 실행 완료 (출력 없음)';
-          outputEl.appendChild(line);
-        } else {
-          result.output.forEach(line => {
-            const el = document.createElement('span');
-            el.className = 'output-line';
-            el.textContent = line;
-            outputEl.appendChild(el);
-            outputEl.appendChild(document.createTextNode('\n'));
-          });
-        }
-
-        if (result.error) {
+      if (result.output.length === 0 && !result.error) {
+        const line = document.createElement('span');
+        line.className = 'output-line output-success';
+        line.textContent = '// 실행 완료 (출력 없음)';
+        outputEl.appendChild(line);
+      } else {
+        result.output.forEach(line => {
           const el = document.createElement('span');
-          el.className = 'output-line output-error';
-          el.textContent = '오류: ' + result.error;
+          el.className = 'output-line';
+          el.textContent = line;
           outputEl.appendChild(el);
-        }
-      } catch (e) {
-        const outputEl = document.getElementById('output');
-        const el = document.createElement('span');
-        el.className = 'output-line output-error';
-        el.textContent = '오류: ' + e.message;
-        outputEl.appendChild(el);
+          outputEl.appendChild(document.createTextNode('\n'));
+        });
       }
 
-      btn.classList.remove('running');
-      btn.textContent = '▶ 실행';
-    }, 50);
+      if (result.error) {
+        const el = document.createElement('span');
+        el.className = 'output-line output-error';
+        el.textContent = '오류: ' + result.error;
+        outputEl.appendChild(el);
+      }
+    } catch (e) {
+      const el = document.createElement('span');
+      el.className = 'output-line output-error';
+      el.textContent = '오류: ' + e.message;
+      document.getElementById('output').appendChild(el);
+    }
+
+    btn.classList.remove('running');
+    btn.textContent = '▶ 실행';
+  }, 50);
+}
+
+// 에디터 이벤트
+const editor = document.getElementById('editor');
+
+editor.addEventListener('input', updateHighlight);
+
+editor.addEventListener('scroll', () => {
+  document.getElementById('highlight').scrollTop = editor.scrollTop;
+  document.getElementById('highlight').scrollLeft = editor.scrollLeft;
+});
+
+editor.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    e.preventDefault();
+    runCode();
   }
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    const start = e.target.selectionStart;
+    const end = e.target.selectionEnd;
+    e.target.value = e.target.value.substring(0, start) + '  ' + e.target.value.substring(end);
+    e.target.selectionStart = e.target.selectionEnd = start + 2;
+    updateHighlight();
+  }
+});
 
-  // Ctrl+Enter / Cmd+Enter 로 실행
-  document.getElementById('editor').addEventListener('keydown', e => {
-    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-      e.preventDefault();
-      runCode();
-    }
-    // 탭 들여쓰기
-    if (e.key === 'Tab') {
-      e.preventDefault();
-      const start = e.target.selectionStart;
-      const end = e.target.selectionEnd;
-      e.target.value = e.target.value.substring(0, start) + '  ' + e.target.value.substring(end);
-      e.target.selectionStart = e.target.selectionEnd = start + 2;
-    }
-  });
-
-  // 기본 예제 로드
-  loadExample('hello');
+// 초기 예제 로드
+loadExample('hello');
 </script>
 </body>
 </html>
