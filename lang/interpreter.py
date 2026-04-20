@@ -3,27 +3,27 @@ lang.interpreter
 =====================
 AST를 직접 실행하는 트리 워킹(tree-walking) 인터프리터.
 """
-
-
+ 
+ 
 class RuntimeError_(Exception):
     """런타임 에러"""
     pass
-
-
+ 
+ 
 class Interpreter:
     def __init__(self):
         self.env = {}
-
+ 
     def run(self, ast):
         if ast[0] != 'Program':
             raise RuntimeError_(f"Expected Program node, got {ast[0]}")
         for stmt in ast[1]:
             self.exec_stmt(stmt)
-
+ 
     # -------- 문장 실행 --------
     def exec_stmt(self, stmt):
         t = stmt[0]
-
+ 
         if t == 'VarDecl':
             _, vt, name, expr = stmt
             v = self.eval_expr(expr)
@@ -35,11 +35,11 @@ class Interpreter:
             elif vt == 'string':
                 v = str(v)
             self.env[name] = v
-
+ 
         elif t == 'Assign':
             _, name, expr = stmt
             self.env[name] = self.eval_expr(expr)
-
+ 
         elif t == 'IncDec':
             _, name, op = stmt
             if name not in self.env:
@@ -48,23 +48,23 @@ class Interpreter:
                 self.env[name] += 1
             else:
                 self.env[name] -= 1
-
+ 
         elif t == 'Print':
             v = self.eval_expr(stmt[1])
             print(self._format_output(v))
-
+ 
         elif t == 'If':
             _, cond, then_b, else_b = stmt
             if self.eval_expr(cond):
                 self.exec_block(then_b)
             elif else_b:
                 self.exec_block(else_b)
-
+ 
         elif t == 'While':
             _, cond, body = stmt
             while self.eval_expr(cond):
                 self.exec_block(body)
-
+ 
         elif t == 'For':
             _, var, args, body = stmt
             vals = [int(self.eval_expr(a)) for a in args]
@@ -79,18 +79,18 @@ class Interpreter:
             for i in it:
                 self.env[var] = i
                 self.exec_block(body)
-
+ 
         else:
             raise RuntimeError_(f"Unknown statement: {t}")
-
+ 
     def exec_block(self, block):
         for s in block:
             self.exec_stmt(s)
-
+ 
     # -------- 표현식 평가 --------
     def eval_expr(self, expr):
         t = expr[0]
-
+ 
         if t == 'Number':
             return expr[1]
         if t == 'String':
@@ -100,7 +100,7 @@ class Interpreter:
             if name not in self.env:
                 raise RuntimeError_(f"Undefined variable: {name}")
             return self.env[name]
-
+ 
         if t == 'BinOp':
             _, op, l, r = expr
             lv = self.eval_expr(l)
@@ -113,7 +113,7 @@ class Interpreter:
             if op == '-': return lv - rv
             if op == '*': return lv * rv
             if op == '/': return lv / rv
-
+ 
         if t == 'Compare':
             _, op, l, r = expr
             lv = self.eval_expr(l)
@@ -123,7 +123,7 @@ class Interpreter:
                 '<': lv < rv, '<=': lv <= rv,
                 '>': lv > rv, '>=': lv >= rv,
             }[op]
-
+ 
         if t == 'Logical':
             _, op, l, r = expr
             lv = self.eval_expr(l)
@@ -131,14 +131,14 @@ class Interpreter:
                 return bool(lv) and bool(self.eval_expr(r))
             if op == 'or':
                 return bool(lv) or bool(self.eval_expr(r))
-
+ 
         if t == 'UnaryOp':
             _, op, o = expr
             if op == 'not':
                 return not self.eval_expr(o)
-
+ 
         raise RuntimeError_(f"Unknown expression: {t}")
-
+ 
     # -------- 출력 포맷팅 --------
     @staticmethod
     def _format_output(v):
@@ -146,8 +146,8 @@ class Interpreter:
         if isinstance(v, float) and v.is_integer():
             return str(int(v))
         return str(v)
-
-
+ 
+ 
 def interpret(ast):
     """AST를 실행하는 편의 함수"""
     Interpreter().run(ast)

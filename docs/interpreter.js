@@ -2,7 +2,7 @@
  * 해씨 (lang-lang) JavaScript 인터프리터
  * Tokenizer → Parser → Interpreter
  */
-
+ 
 const LangInterpreter = (() => {
   // ============================================================
   // 1. 수 변환 (Converter)
@@ -136,7 +136,16 @@ const LangInterpreter = (() => {
         continue;
       }
 
-      // 줄바꿈
+      // 줄바꿈: '결국' 키워드 또는 일반 \n 모두 허용
+      if (source.slice(pos, pos + 2) === "결국") {
+        flushIdent();
+        if (!tokens.length || tokens[tokens.length - 1][0] !== "NEWLINE") {
+          tokens.push(["NEWLINE", null]);
+        }
+        pos += 2;
+        continue;
+      }
+
       if (c === "\n") {
         flushIdent();
         if (!tokens.length || tokens[tokens.length - 1][0] !== "NEWLINE") {
