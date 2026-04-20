@@ -17,7 +17,7 @@ classifiers = [
 ]
 
 [project.scripts]
-sunflower = "sunflower.cli:main"
+rang = "sunflower.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
