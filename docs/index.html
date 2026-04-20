@@ -382,7 +382,7 @@
     // 약간의 딜레이로 UI 업데이트 보장
     setTimeout(() => {
       try {
-        const result = SunflowerInterpreter.run(code);
+        const result = LangInterpreter.run(code);
         const outputEl = document.getElementById('output');
 
         if (result.output.length === 0 && !result.error) {
