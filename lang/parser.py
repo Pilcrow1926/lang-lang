@@ -1,5 +1,5 @@
 """
-sunflower.parser
+lang.parser
 ================
 토큰 리스트를 AST(추상 구문 트리)로 변환하는 재귀 하강 파서.
 

@@ -1,14 +1,14 @@
 """
-sunflower-lang (해씨)
+lang-lang (해씨)
 =====================
 한글 의성어/의태어로 이루어진 난해한 프로그래밍 언어.
 
 사용 예:
-    >>> from sunflower import run
+    >>> from lang import run
     >>> run('난뭐정안녕정엇')
     안녕
 
-    >>> from sunflower import number_to_sf, parse_number
+    >>> from lang import number_to_sf, parse_number
     >>> number_to_sf(100)
     '대근근근근근근근근근근근근근근근근근랑'
     >>> parse_number('대훌훌훌랑')

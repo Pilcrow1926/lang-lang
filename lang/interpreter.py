@@ -1,5 +1,5 @@
 """
-sunflower.interpreter
+lang.interpreter
 =====================
 AST를 직접 실행하는 트리 워킹(tree-walking) 인터프리터.
 """

@@ -1,7 +1,7 @@
 """
-sunflower.tokenizer
+lang.tokenizer
 ===================
-해씨(sunflower-lang) 소스 코드를 토큰 리스트로 변환하는 토크나이저.
+랑(lang-lang) 소스 코드를 토큰 리스트로 변환하는 토크나이저.
 
 토큰 타입:
 - NUMBER, STRING, IDENTIFIER: 리터럴과 식별자
