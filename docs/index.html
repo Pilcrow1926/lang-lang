@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>해씨 🌻 온라인 인터프리터</title>
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&family=Gowun+Dodum&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0f0f;
+    --surface: #1a1a1a;
+    --surface2: #242424;
+    --border: #2e2e2e;
+    --accent: #f5c842;
+    --accent2: #f0a500;
+    --text: #e8e8e0;
+    --text-dim: #888880;
+    --error: #ff6b6b;
+    --success: #6bffb8;
+    --font-code: 'Nanum Gothic Coding', monospace;
+    --font-ui: 'Gowun Dodum', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-ui);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* 헤더 */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    height: 56px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    flex-shrink: 0;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+
+  .logo-icon {
+    font-size: 22px;
+    animation: sway 3s ease-in-out infinite;
+  }
+
+  @keyframes sway {
+    0%, 100% { transform: rotate(-5deg); }
+    50% { transform: rotate(5deg); }
+  }
+
+  .logo-lang {
+    color: var(--accent);
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 16px;
+    border-radius: 6px;
+    border: none;
+    font-family: var(--font-ui);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #0f0f0f;
+    font-weight: 700;
+  }
+
+  .btn-primary:hover {
+    background: var(--accent2);
+    transform: translateY(-1px);
+  }
+
+  .btn-primary:active {
+    transform: translateY(0);
+  }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+  }
+
+  .btn-ghost:hover {
+    background: var(--surface2);
+    color: var(--text);
+  }
+
+  /* 메인 레이아웃 */
+  main {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr auto;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* 편집기 */
+  .editor-pane {
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .pane-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    flex-shrink: 0;
+  }
+
+  .pane-header-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  #editor {
+    flex: 1;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-code);
+    font-size: 14px;
+    line-height: 1.7;
+    padding: 20px;
+    border: none;
+    outline: none;
+    resize: none;
+    tab-size: 2;
+  }
+
+  #editor::placeholder {
+    color: var(--text-dim);
+    opacity: 0.5;
+  }
+
+  /* 출력 */
+  .output-pane {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  #output {
+    flex: 1;
+    padding: 20px;
+    font-family: var(--font-code);
+    font-size: 14px;
+    line-height: 1.7;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+
+  #output:empty::before {
+    content: '// 실행 결과가 여기에 표시됩니다';
+    color: var(--text-dim);
+    opacity: 0.4;
+    font-style: italic;
+  }
+
+  .output-line { display: block; }
+  .output-error { color: var(--error); }
+  .output-success { color: var(--success); }
+
+  /* 예제 바 */
+  .examples-bar {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    overflow-x: auto;
+    flex-shrink: 0;
+  }
+
+  .examples-label {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    margin-right: 4px;
+  }
+
+  .example-btn {
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-dim);
+    font-family: var(--font-ui);
+    font-size: 12px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s;
+  }
+
+  .example-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(245, 200, 66, 0.05);
+  }
+
+  /* 스크롤바 */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+
+  /* 실행 중 애니메이션 */
+  .btn-primary.running {
+    animation: pulse 0.8s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+  }
+
+  /* 반응형 */
+  @media (max-width: 640px) {
+    main {
+      grid-template-columns: 1fr;
+      grid-template-rows: 1fr 1fr auto;
+    }
+    .editor-pane {
+      border-right: none;
+      border-bottom: 1px solid var(--border);
+    }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <span class="logo-icon">🌻</span>
+    <span>해씨 <span class="logo-lang">랑</span></span>
+  </div>
+  <div class="header-actions">
+    <button class="btn btn-ghost" onclick="clearOutput()">지우기</button>
+    <button class="btn btn-primary" id="runBtn" onclick="runCode()">
+      ▶ 실행
+    </button>
+  </div>
+</header>
+
+<main>
+  <div class="editor-pane">
+    <div class="pane-header">
+      <div class="pane-header-left">
+        <div class="dot"></div>
+        <span>코드 편집기</span>
+      </div>
+      <span>.sf</span>
+    </div>
+    <textarea id="editor" spellcheck="false" placeholder="해씨 코드를 입력하세요...
+예: 난뭐정안녕하세요정엇"></textarea>
+  </div>
+
+  <div class="output-pane">
+    <div class="pane-header">
+      <div class="pane-header-left">
+        <div class="dot" style="background: var(--success)"></div>
+        <span>출력</span>
+      </div>
+    </div>
+    <div id="output"></div>
+  </div>
+
+  <div class="examples-bar">
+    <span class="examples-label">예제</span>
+    <button class="example-btn" onclick="loadExample('hello')">👋 Hello World</button>
+    <button class="example-btn" onclick="loadExample('gugudan')">✖️ 구구단</button>
+    <button class="example-btn" onclick="loadExample('fibonacci')">🌀 피보나치</button>
+    <button class="example-btn" onclick="loadExample('condition')">🔀 조건문</button>
+    <button class="example-btn" onclick="loadExample('forloop')">🔁 for 반복</button>
+    <button class="example-btn" onclick="loadExample('escape')">💬 이스케이프</button>
+  </div>
+</main>
+
+<script src="interpreter.js"></script>
+<script>
+  const examples = {
+    hello: `난뭐정안녕하세요, 해씨입니다!정엇`,
+
+    gugudan: `매우 단 캬 근랑
+매우 i 뒷 나가뭐두랑그래대근근랑엇 호야 택
+  난뭐단헐정 x 정헐i헐정 = 정헐뭐단겸i엇엇
+틱`,
+
+    fibonacci: `매우 a 캬 여랑
+매우 b 캬 두랑
+매우 i 캬 여랑
+장미 뭐i준대근근랑엇 호야 택
+  난뭐a엇
+  매우 temp 캬 a헐b
+  a 캬 b
+  b 캬 temp
+  i허얼
+틱`,
+
+    condition: `매우 나이 캬 대훌훌훌랑
+엄 뭐나이영대훌훌훌랑엇 호야 택
+  난뭐정성인입니다정엇
+틱
+내꿈꿔 호야 택
+  난뭐정미성년자입니다정엇
+틱`,
+
+    forloop: `매우 i 뒷 나가뭐두랑그래대근근랑엇 호야 택
+  난뭐i헐정번정엇
+틱`,
+
+    escape: `난뭐정빛정 기호 출력하기정엇
+난뭐정비이건 매우 엄 내꿈꿔잋 키워드들정엇`,
+  };
+
+  function loadExample(name) {
+    document.getElementById('editor').value = examples[name];
+    clearOutput();
+  }
+
+  function clearOutput() {
+    document.getElementById('output').innerHTML = '';
+  }
+
+  function runCode() {
+    const code = document.getElementById('editor').value.trim();
+    if (!code) return;
+
+    const btn = document.getElementById('runBtn');
+    btn.classList.add('running');
+    btn.textContent = '⏳ 실행 중';
+
+    clearOutput();
+
+    // 약간의 딜레이로 UI 업데이트 보장
+    setTimeout(() => {
+      try {
+        const result = SunflowerInterpreter.run(code);
+        const outputEl = document.getElementById('output');
+
+        if (result.output.length === 0 && !result.error) {
+          const line = document.createElement('span');
+          line.className = 'output-line output-success';
+          line.textContent = '// 실행 완료 (출력 없음)';
+          outputEl.appendChild(line);
+        } else {
+          result.output.forEach(line => {
+            const el = document.createElement('span');
+            el.className = 'output-line';
+            el.textContent = line;
+            outputEl.appendChild(el);
+            outputEl.appendChild(document.createTextNode('\n'));
+          });
+        }
+
+        if (result.error) {
+          const el = document.createElement('span');
+          el.className = 'output-line output-error';
+          el.textContent = '오류: ' + result.error;
+          outputEl.appendChild(el);
+        }
+      } catch (e) {
+        const outputEl = document.getElementById('output');
+        const el = document.createElement('span');
+        el.className = 'output-line output-error';
+        el.textContent = '오류: ' + e.message;
+        outputEl.appendChild(el);
+      }
+
+      btn.classList.remove('running');
+      btn.textContent = '▶ 실행';
+    }, 50);
+  }
+
+  // Ctrl+Enter / Cmd+Enter 로 실행
+  document.getElementById('editor').addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      e.preventDefault();
+      runCode();
+    }
+    // 탭 들여쓰기
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      const start = e.target.selectionStart;
+      const end = e.target.selectionEnd;
+      e.target.value = e.target.value.substring(0, start) + '  ' + e.target.value.substring(end);
+      e.target.selectionStart = e.target.selectionEnd = start + 2;
+    }
+  });
+
+  // 기본 예제 로드
+  loadExample('hello');
+</script>
+</body>
+</html>
