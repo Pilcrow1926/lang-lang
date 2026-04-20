@@ -109,14 +109,45 @@ def tokenize(source):
             pos += 1
             continue
 
-        # 문자열: 정...정
+        # 문자열: 정...정 (이스케이프 지원)
         if c == '정':
             flush_ident()
-            end = source.find('정', pos + 1)
-            if end == -1:
-                raise TokenizeError(f"Unclosed string at position {pos}")
-            tokens.append(('STRING', source[pos + 1:end]))
-            pos = end + 1
+            result = []
+            pos += 1  # 여는 정 건너뜀
+            closed = False
+            while pos < n:
+                ch = source[pos]
+                if ch == '정':
+                    # 닫는 정
+                    pos += 1
+                    closed = True
+                    break
+                elif ch == '빛':
+                    # 단일 이스케이프: 빛 + 다음 문자를 문자 그대로
+                    pos += 1
+                    if pos < n:
+                        result.append(source[pos])
+                        pos += 1
+                elif ch == '비':
+                    # 이스케이프 블록: 비...잋
+                    pos += 1
+                    while pos < n:
+                        if source[pos] == '잋':
+                            pos += 1
+                            break
+                        elif source[pos] == '빛' and pos + 1 < n and source[pos + 1] == '잋':
+                            # 빛잋 → 잋 문자 그대로
+                            result.append('잋')
+                            pos += 2
+                        else:
+                            result.append(source[pos])
+                            pos += 1
+                else:
+                    result.append(ch)
+                    pos += 1
+            if not closed:
+                raise TokenizeError(f"Unclosed string")
+            tokens.append(('STRING', ''.join(result)))
             continue
 
         # 수 표현 감지 (느그/대+기본값/여두근훌)
@@ -152,6 +183,21 @@ def tokenize(source):
                 matched = True
                 break
         if matched:
+            continue
+
+        # 식별자 안에서 비...잋 이스케이프 블록
+        if c == '비':
+            pos += 1
+            while pos < n:
+                if source[pos] == '잋':
+                    pos += 1
+                    break
+                elif source[pos] == '빛' and pos + 1 < n and source[pos + 1] == '잋':
+                    ident_buf.append('잋')
+                    pos += 2
+                else:
+                    ident_buf.append(source[pos])
+                    pos += 1
             continue
 
         # 식별자 문자 누적 (키워드/숫자/문자열/공백/줄바꿈 어디에도 안 걸린 문자)
